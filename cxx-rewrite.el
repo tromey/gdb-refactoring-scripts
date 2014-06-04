@@ -1,11 +1,6 @@
 ;;; This rewrites C++ keywords in the gdb source.
 
 
-;;; TO DO:
-;;; * RETURN_MASK handling must be implemented
-;;;   it should turn into a different type on the 'catch'
-
-
 (defconst dir-to-scan (pop argv))
 (unless (file-directory-p dir-to-scan)
   (error "Usage: emacs --script cxx-rewrite.el DIR"))
