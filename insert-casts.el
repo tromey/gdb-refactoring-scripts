@@ -39,6 +39,8 @@
 	  (cond
 	   ((looking-back "[[:space:]\n]=[[:space:]\n]+")
 	    (insert "(" type-name ") "))
+	   ((looking-back "\\_<return[[:space:]]+")
+	    (insert "(" type-name ") "))
 	   ((looking-at "\\_<return[[:space:]]+")
 	    (forward-word)
 	    (skip-chars-forward " \t\n")
