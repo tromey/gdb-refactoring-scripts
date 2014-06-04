@@ -1,11 +1,13 @@
 ;;; Insert casts for -Wc++-compat.
 ;;; Run a build with -Wc++-compat and direct the output to a file
 ;;; named "Log" in the build/gdb directory.
+;;; Note you need LANG=C and -ftrack-macro-expansion=0 -Wc++-compat
 ;;; Then run this script.  It will rewrite the sources to insert
 ;;; some needed casts.
 ;;; It doesn't handle everything, just a subset.  And since gcc's
 ;;; error message locations aren't always precise, it sometimes
 ;;; introduces errors.
+;;; This script converts about 90% of the needed spots.
 
 
 ;; DIR is the build directory of gdb.
@@ -28,7 +30,7 @@
 	(find-file filename)
 	;; ... or generated files in the source tree.
 	(unless buffer-read-only
-	  (message "Rewriting %s:%d" filename line)
+	  (message "Rewriting %s:%d:%d" filename line col)
 	  (goto-char (point-min))
 	  (forward-line (1- line))
 	  (forward-char (1- col))
@@ -43,7 +45,7 @@
 	    (insert "(" type-name ") ")))))))
 
 (defconst insert-casts-rx
-  "^\\([^:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\): error: request for implicit conversion from '[^']+' to '\\([^']+\\)'")
+  "^\\([^\n:]+\\):\\([[:digit:]]+\\):\\([[:digit:]]+\\): error: request for implicit conversion from '[^']+' to '\\([^']+\\)'")
 
 ;; rebuild with something like and put output in Log
 ;; (call-process "make" nil (current-buffer) nil
@@ -57,6 +59,7 @@
 	  (line (string-to-int (match-string 2)))
 	  (col (string-to-int (match-string 3)))
 	  (type-name (match-string 4)))
+      ;; (message "Examining %s:%d:%d" filename line col)
       (insert-casts-rewrite-one filename line col type-name))))
 
 (defun insert-casts ()
