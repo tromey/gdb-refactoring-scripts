@@ -10,11 +10,8 @@
 ;;; This script converts about 90% of the needed spots.
 
 
-;; DIR is the build directory of gdb.
-(defconst dir-to-rebuild (pop argv))
-(unless (file-directory-p dir-to-rebuild)
-  (error "Usage: emacs --script insert-casts.el DIR"))
-(setq default-directory dir-to-rebuild)
+(defconst include-pass-two (and argv
+				(equal (pop argv) "--args")))
 
 ;; Ensure gcc emits easy-to-parse quotes.
 (setenv "LANG" "C")
@@ -44,6 +41,9 @@
 	   ((looking-at "\\_<return[[:space:]]+")
 	    (forward-word)
 	    (skip-chars-forward " \t\n")
+	    (insert "(" type-name ") "))
+	   ((and include-pass-two
+		 (looking-back "[,(][[:space:]\n]*"))
 	    (insert "(" type-name ") ")))))))
 
 (defconst insert-casts-rx
