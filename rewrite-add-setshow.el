@@ -1,0 +1,82 @@
+(defconst dir-to-scan (pop argv))
+(unless (file-directory-p dir-to-scan)
+  (error "Usage: emacs --script rewrite-add-setshow.el DIR"))
+
+(defvar all-setshow-functions nil)
+
+(defconst cxxrewrite-dirs '("." "cli" "mi" "python" "tui" "guile" "nat" "common"))
+
+(defun list-files ()
+  (apply #'nconc
+	 (mapcar (lambda (dir)
+		   (directory-files (expand-file-name dir dir-to-scan)
+				    t "\\.[chy]$"))
+		 cxxrewrite-dirs)))
+
+(defconst setshow-arities
+  '(("_enum_cmd" . 6)
+    ("_auto_boolean_cmd" . 5)
+    ("_boolean_cmd" . 5)
+    ("_filename_cmd" . 5)
+    ("_string_cmd" . 5)
+    ("_string_noescape_cmd" . 5)
+    ("_optional_filename_cmd" . 5)
+    ("_integer_cmd" . 5)
+    ("_uinteger_cmd" . 5)
+    ("_zinteger_cmd" . 5)
+    ("_zuinteger_cmd" . 5)
+    ("_zuinteger_unlimited_cmd" . 5)))
+
+(defun forward-one-argument ()
+  (skip-chars-forward ",[:space:]\n")
+  (while (not (eq (char-after) ?,))
+    (forward-sexp)))
+
+(defun scan-file-for-add-setshow (file)
+  ;; (message "Scanning %s" file)
+  (find-file file)
+  (goto-char (point-min))
+  (while (re-search-forward "\\s-+add_setshow\\([a-z_]*\\)\\s-*(\".*?\"," nil t)
+    (let ((count (cdr (assoc (match-string 1) setshow-arities))))
+      (dotimes (_ count)
+	(forward-one-argument))
+      (skip-chars-forward ",[:space:]\n")
+      (when (looking-at "[A-Za-z_0-9]+")
+	(unless (equal (match-string 0) "NULL")
+	  ;; (message "   ... found %s" (match-string 0))
+	  (push (match-string 0) all-setshow-functions))))))
+
+(defun scan-all-files (files)
+  (mapc #'scan-file-for-add-setshow files))
+
+(defun rewrite-one-file (file rx)
+  (message "Rewriting %s" file)
+  (find-file file)
+  (unless buffer-read-only
+    (goto-char (point-min))
+    (while (re-search-forward rx nil t)
+      (message "  Found %s" (match-string 1))
+      (goto-char (match-end 0))
+      (insert "const ")
+      (save-excursion
+	(add-change-log-entry))
+      (search-forward ",")
+      (when (save-excursion
+	      (end-of-line)
+	      (> (current-column) 79))
+	(insert "\n")
+	(indent-for-tab-command)))))
+
+(defun rewrite-files (files)
+  (let* ((rx-list (sort (delete-dups all-setshow-functions) #'string<))
+	 (rx (concat "^\\(" (regexp-opt rx-list) "\\)\\s-*(")))
+    (message "RX = %S" rx)
+    (dolist (file files)
+      (rewrite-one-file file rx))))
+
+(let ((all-files (list-files)))
+  (message "Scanning...")
+  (scan-all-files all-files)
+  (message "Rewriting...")
+  (rewrite-files all-files)
+  (save-some-buffers t))
