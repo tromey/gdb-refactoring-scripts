@@ -2,10 +2,6 @@
 
 (defvar rw-directory ".")
 
-;; FIXME should just scan the directory
-(defvar rw-subdirs  '("." "cli" "mi" "python" "tui" "guile" "nat"
-		      "target" "common"))
-
 (require 'add-log)
 (setq add-log-always-start-new-record t)
 
@@ -18,22 +14,20 @@
 (defconst rw-subcommand (pop argv))
 
 (defun rw-files ()
-  (sort (apply #'nconc
-	       (mapcar (lambda (dir)
-			 (directory-files (expand-file-name dir rw-directory)
-					  t "\\.[cyhl]$"))
-		       rw-subdirs))
+  (sort (directory-files-recursively (expand-file-name dir rw-directory)
+				     "\\.[cyhl]$")
 	#'string<))
 
 (defun rw-rewrite (callback)
   (dolist (file (rw-files))
-    (message "Processing %s" file)
-    (find-file file)
-    (goto-char (point-min))
-    (funcall callback)
-    (when (buffer-modified-p)
-      (save-buffer))
-    (kill-buffer)))
+    (unless (string-match "/testsuite/" file)
+      (message "Processing %s" file)
+      (find-file file)
+      (goto-char (point-min))
+      (funcall callback)
+      (when (buffer-modified-p)
+	(save-buffer))
+      (kill-buffer))))
 
 (defun rw-save-buffers ()
   "Save unsaved buffers.  Handy for ChangeLog."
