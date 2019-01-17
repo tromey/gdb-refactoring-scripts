@@ -14,9 +14,7 @@
 (defconst rw-subcommand (pop argv))
 
 (defun rw-files ()
-  (sort (directory-files-recursively (expand-file-name dir rw-directory)
-				     "\\.[cyhl]$")
-	#'string<))
+  (sort (directory-files-recursively rw-directory "\\.[cyhl]$") #'string<))
 
 (defun rw-rewrite (callback)
   (dolist (file (rw-files))
@@ -39,6 +37,20 @@
 (defun rw-add-change-log-entry ()
   (add-change-log-entry)
   (setq add-log-always-start-new-record nil))
+
+(defvar rw-was-first-cl-entry t)
+
+(defun rw-final-change-log-text (text)
+  ;; Called in the source buffer, only do something if modified.
+  (if (buffer-modified-p)
+      (save-excursion
+	(find-file (expand-file-name "ChangeLog" rw-directory))
+	;; Point should already be at the right spot.
+	(insert text)
+	(fill-paragraph)
+	(unless rw-was-first-cl-entry
+	  (delete-blank-lines))
+	(setq rw-was-first-cl-entry nil))))
 
 (load (concat "rewriter-" rw-subcommand))
 (rw-save-buffers)
