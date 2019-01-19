@@ -10,8 +10,7 @@
 (defun rw-srepl-one ()
   (while (re-search-forward rw-from nil t)
     (replace-match rw-to nil t)
-    (save-excursion
-      (rw-add-change-log-entry)))
+    (rw-add-change-log-entry))
   (rw-final-change-log-text (concat "Replace \"" rw-raw-from
 				    "\" with \"" rw-to "\".")))
 

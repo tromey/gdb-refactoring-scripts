@@ -35,8 +35,9 @@
       (save-buffer))))
 
 (defun rw-add-change-log-entry ()
-  (add-change-log-entry)
-  (setq add-log-always-start-new-record nil))
+  (save-excursion
+    (add-change-log-entry)
+    (setq add-log-always-start-new-record nil)))
 
 (defvar rw-was-first-cl-entry t)
 
