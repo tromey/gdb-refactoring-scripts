@@ -19,7 +19,8 @@
 (defun rw-rewrite (callback)
   (dolist (file (rw-files))
     (unless (string-match "/\\(gnulib\\|testsuite\\)/" file)
-      (message "Processing %s" file)
+      ;; FIXME verbose mode
+      ;;(message "Processing %s" file)
       (find-file file)
       (goto-char (point-min))
       (funcall callback)
