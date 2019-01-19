@@ -46,7 +46,7 @@
   ;; Called in the source buffer, only do something if modified.
   (if (buffer-modified-p)
       (save-excursion
-	(find-file (expand-file-name "ChangeLog" rw-directory))
+	(find-change-log)
 	;; Point should already be at the right spot.
 	(insert text)
 	(fill-paragraph)
