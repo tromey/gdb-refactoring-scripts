@@ -40,13 +40,14 @@
     (add-change-log-entry)
     (setq add-log-always-start-new-record nil)))
 
-(defvar rw-was-first-cl-entry t)
+;; This is local to the ChangeLog.
+(defvar-local rw-was-first-cl-entry t)
 
 (defun rw-final-change-log-text (text)
   ;; Called in the source buffer, only do something if modified.
   (if (buffer-modified-p)
       (save-excursion
-	(find-change-log)
+	(find-file (find-change-log))
 	;; Point should already be at the right spot.
 	(insert text)
 	(fill-paragraph)
