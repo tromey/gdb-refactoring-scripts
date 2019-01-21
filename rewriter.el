@@ -5,6 +5,12 @@
 (require 'add-log)
 (setq add-log-always-start-new-record t)
 
+(setq add-log-full-name
+      (string-trim (shell-command-to-string "git config user.name")))
+
+(setq add-log-mailing-address
+      (string-trim (shell-command-to-string "git config user.email")))
+
 (defconst rw-base (file-name-directory load-file-name))
 (push rw-base load-path)
 
