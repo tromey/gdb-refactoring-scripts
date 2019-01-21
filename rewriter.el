@@ -19,20 +19,29 @@
 
 (defconst rw-subcommand (pop argv))
 
+(defun rw-memoize-files nil)
+
 (defun rw-files ()
-  (sort (directory-files-recursively rw-directory "\\.[cyhl]$") #'string<))
+  (unless rw-memoize-files
+    (setq rw-memoize-files
+	  (sort
+	   (cl-remove-if
+	    (lambda (name)
+	      (string-match "/\\(gnulib\\|testsuite\\)/" name))
+	    (directory-files-recursively rw-directory "\\.[cyhl]$")
+	    #'string<))))
+  rw-memoize-files)
 
 (defun rw-rewrite (callback)
   (dolist (file (rw-files))
-    (unless (string-match "/\\(gnulib\\|testsuite\\)/" file)
-      ;; FIXME verbose mode
-      ;;(message "Processing %s" file)
-      (find-file file)
-      (goto-char (point-min))
-      (funcall callback)
-      (when (buffer-modified-p)
-	(save-buffer))
-      (kill-buffer))))
+    ;; FIXME verbose mode
+    ;;(message "Processing %s" file)
+    (find-file file)
+    (goto-char (point-min))
+    (funcall callback)
+    (when (buffer-modified-p)
+      (save-buffer))
+    (kill-buffer)))
 
 (defun rw-save-buffers ()
   "Save unsaved buffers.  Handy for ChangeLog."
