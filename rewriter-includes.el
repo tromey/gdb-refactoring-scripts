@@ -45,8 +45,10 @@
   (unless is-header
     (let ((main-header
 	   (cond
-	    ((string-match "/\\(arch\\|common\\|nat\\|target\\)/" filename) "common-defs.h")
-	    ((string-match "/gdbserver/" filename) "server.h")
+	    ((string-match "/\\(arch\\|common\\|nat\\|target\\)/" filename)
+	     "common-defs.h")
+	    ((string-match "/gdbserver/" filename)
+	     "server.h")
 	    (t "defs.h"))))
       (insert "#include \"" main-header "\"\n")
       (setq include-list (rw-delete-include include-list main-header))
