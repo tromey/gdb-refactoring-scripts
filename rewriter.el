@@ -1,6 +1,6 @@
 ;; rewriter base code.
 
-(defvar rw-directory ".")
+(defvar rw-directory (expand-file-name "."))
 
 (require 'add-log)
 (setq add-log-always-start-new-record t)
