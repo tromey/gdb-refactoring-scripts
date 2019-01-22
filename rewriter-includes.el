@@ -29,7 +29,7 @@
 		   (not (member (expand-file-name name rw-directory) (rw-files))))
 	  ;; Must be between " and <.
 	  (setq style "."))
-	(push (cons name style) result))
+	(push (list name style) result))
       (forward-line)
       (setq last-include (point)))
     (goto-char last-include)
@@ -70,18 +70,18 @@
 	(sort include-list
 	      (lambda (a b)
 		;; <> sorts earlier than ""
-		(if (string> (cdr a) (cdr b))
+		(if (string> (cadr a) (cadr b))
 		    t
-		  (if (string= (cdr a) (cdr b))
+		  (if (string= (cadr a) (cadr b))
 		      (string< (car a) (car b)))))))
   ;; Insert a newline between base and <> and "" stanzas.
   (let ((last-bracket
 	 ;; Do not need a new stanza initially in the .h case.
 	 (if is-header
-	     (cdr (car include-list))
+	     (cadr (car include-list))
 	   "")))
     (dolist (item include-list)
-      (let ((new-bracket (cdr item)))
+      (let ((new-bracket (cadr item)))
 	(unless (string= last-bracket new-bracket)
 	  (insert "\n")
 	  (setq last-bracket new-bracket))
