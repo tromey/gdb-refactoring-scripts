@@ -1,7 +1,6 @@
 ;; Sort includes.
 
 ;; FIXME rewrite to common/
-;; FIXME gdbserver/ax.c -vs- ax.h
 ;; FIXME insert header guards
 
 (defun rw-skip-intro (filename is-header)
@@ -98,7 +97,7 @@
 	  (let ((base-dir
 		 (cond
 		  ((string-match "/gdbserver/" filename)
-		   (expand-file-name "gdbserver" rw-directory))
+		   (file-name-directory filename))
 		  (t rw-directory))))
 	    (insert "#include \"" (file-relative-name header base-dir) "\"\n"))
 	  (setq include-list (rw-delete-include
