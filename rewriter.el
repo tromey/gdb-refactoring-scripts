@@ -5,6 +5,9 @@
 (require 'add-log)
 (setq add-log-always-start-new-record t)
 
+(require 'subr-x)
+(require 'cl-macs)
+
 (setq add-log-full-name
       (string-trim (shell-command-to-string "git config user.name")))
 
@@ -19,7 +22,7 @@
 
 (defconst rw-subcommand (pop argv))
 
-(defun rw-memoize-files nil)
+(defvar rw-memoize-files nil)
 
 (defun rw-files ()
   (unless rw-memoize-files
@@ -28,14 +31,14 @@
 	   (cl-remove-if
 	    (lambda (name)
 	      (string-match "/\\(gnulib\\|testsuite\\)/" name))
-	    (directory-files-recursively rw-directory "\\.[cyhl]$")
-	    #'string<))))
+	    (directory-files-recursively rw-directory "\\.[cyhl]$"))
+	   #'string<)))
   rw-memoize-files)
 
 (defun rw-rewrite (callback)
   (dolist (file (rw-files))
     ;; FIXME verbose mode
-    ;;(message "Processing %s" file)
+    (message "Processing %s" file)
     (find-file file)
     (goto-char (point-min))
     (funcall callback)
