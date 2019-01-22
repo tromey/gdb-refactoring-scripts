@@ -1,6 +1,5 @@
 ;; Sort includes.
 
-;; FIXME rewrite to common/
 ;; FIXME insert header guards
 
 (defun rw-skip-intro (filename is-header)
