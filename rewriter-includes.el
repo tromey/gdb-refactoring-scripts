@@ -125,7 +125,9 @@
 	(insert (nth 2 item) "\n")))))
 
 (defun rw-rewrite-includes ()
-  (unless buffer-read-only
+  (unless (or buffer-read-only
+	      ;; This file is weird so we skip it.
+	      (string-match "/gdbreplay\\.c$" (buffer-file-name)))
     (let ((is-header (string= (file-name-extension (buffer-file-name)) "h")))
       (rw-skip-intro (buffer-file-name) is-header)
       (let* ((start (point))
