@@ -91,7 +91,6 @@
       (let ((header (concat (file-name-sans-extension filename) ".h")))
 	(when (and (member (expand-file-name header rw-directory) (rw-files))
 		   ;; Ugh.
-		   (not (string-match "/stabsread\\.h$" header))
 		   (not (string-match "/thread-iter\\.h$" header)))
 	  (let ((base-dir
 		 (cond
