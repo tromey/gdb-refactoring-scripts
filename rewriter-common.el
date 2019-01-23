@@ -7,9 +7,9 @@
   ;; could maybe check for "" -vs- <> consistency.
   (while (re-search-forward "^#\\s-*include \"\\([^\"]*\\)\"" nil t)
     (let ((name (match-string 1)))
-      (unless (or (member (expand-file-name name) (rw-files))
-		  (member (expand-file-name name rw-directory) (rw-files)))
-	(when (member (expand-file-name name rw-common-dir) (rw-files))
+      (unless (or (file-exists-p (expand-file-name name))
+		  (file-exists-p (expand-file-name name rw-directory)))
+	(when (file-exists-p (expand-file-name name rw-common-dir))
 	  (replace-match (concat "common/" name) nil t nil 1)
 	  (rw-add-change-log-entry)))))
   (rw-final-change-log-text "Fix common/ includes."))
