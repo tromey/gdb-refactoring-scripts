@@ -92,15 +92,15 @@
 	(when (and (member (expand-file-name header rw-directory) (rw-files))
 		   ;; Ugh.
 		   (not (string-match "/thread-iter\\.h$" header)))
-	  (let ((base-dir
-		 (cond
-		  ((string-match "/gdbserver/" filename)
-		   (file-name-directory filename))
-		  (t rw-directory))))
-	    (insert "#include \"" (file-relative-name header base-dir) "\"\n"))
-	  (setq include-list (rw-delete-include
-			      include-list
-			      (file-relative-name header rw-directory)))))))
+	  (let* ((base-dir
+		  (cond
+		   ((string-match "/gdbserver/" filename)
+		    (file-name-directory filename))
+		   (t rw-directory)))
+		 (relative-name (file-relative-name header base-dir)))
+	    (insert "#include \"" relative-name "\"\n")
+	    (setq include-list (rw-delete-include include-list
+						  relative-name)))))))
   (setq include-list
 	(sort include-list
 	      (lambda (a b)
