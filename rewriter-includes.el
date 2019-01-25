@@ -82,7 +82,7 @@
     (let ((main-header
 	   (cond
 	    ((string-match "/\\(arch\\|common\\|nat\\|target\\)/" filename)
-	     "common-defs.h")
+	     "common/common-defs.h")
 	    ((string-match "/gdbserver/" filename)
 	     "server.h")
 	    (t "defs.h"))))
