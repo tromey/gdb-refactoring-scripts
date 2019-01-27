@@ -23,13 +23,15 @@
 	  (when (save-excursion (rw-check-end-guard-and-zap))
 	    (point)))))))
 
-(defun rw-rewrite-guard (new-name where text)
+(defun rw-rewrite-guard (new-name text)
   (goto-char (point-min))
   (rw-add-change-log-entry)
-  (goto-char where)
-  (delete-blank-lines)
-  (insert "\n#ifndef " new-name "\n"
+  (forward-comment 1)
+  (insert "\n\n#ifndef " new-name "\n"
 	  "#define " new-name "\n\n")
+  (delete-region (point) (save-excursion
+			   (skip-chars-forward " \t\r\n")
+			   (point)))
   (goto-char (point-max))
   (delete-blank-lines)
   (insert "\n#endif /* " new-name " */\n")
@@ -54,15 +56,10 @@
 	    (if (integerp end)
 		(progn
 		  (delete-region start end)
-		  (rw-rewrite-guard include-name start
-				    "Rename include guard."))
+		  (rw-rewrite-guard include-name "Rename include guard."))
 	      (if (not (eq end :ok))
 		  (message "... missing include guard!?"))))
 	;; No include guard.
-	(goto-char (point-min))
-	;; Put the include guard just after the GPL comment.
-	(forward-comment 1)
-	(skip-chars-forward " \t\r\n")
-	(rw-rewrite-guard include-name (point) "Add include guard.")))))
+	(rw-rewrite-guard include-name "Add include guard.")))))
 
 (rw-rewrite #'rw-rewrite-guards)
