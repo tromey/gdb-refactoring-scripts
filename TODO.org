@@ -1,0 +1,8 @@
+* TODO option parsing
+* TODO verbose mode
+* TODO subcommand help
+* TODO use git ls-files?
+* TODO handle .# files gracefully on C-c
+* TODO do not bother with backup files
+* TODO maybe add "git reset --hard" mode
+* TODO write a readme
