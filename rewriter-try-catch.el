@@ -7,7 +7,7 @@
 	  ;; Match 2, 3, 4
 	  "\\|\\(CATCH[ \t]*(\\([^, \t]*\\),[ \t]*\\([^ \t]*\\))\\)"
 	  ;; Match 5
-	  "\\|\\(END_CATCH\\)"
+	  "\\|\\(END_CATCH;?\\)"
 	  "\\)[ \t]*$"))
 
 (defun rw-rewrite-try-catch ()
