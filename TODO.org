@@ -1,5 +1,7 @@
+* TODO replace rw-rewrite with a macro
 * TODO option parsing
 * TODO verbose mode
+* TODO better error output
 * TODO subcommand help
 * TODO use git ls-files?
 * TODO handle .# files gracefully on C-c
