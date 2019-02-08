@@ -19,7 +19,12 @@
 	  "@"
 	;; C++ includes
 	"<")
-    style))
+    ;; This eventually and trickily arranges for non-gdb headers to be
+    ;; included earlier.
+    (if (not (member (expand-file-name name rw-directory) (rw-files)))
+	;; Must be between " and <.
+	(setq style ".")
+      style)))
 
 (defun rw-scan-condition ()
   (let ((kind nil)
@@ -60,13 +65,6 @@
 	(let ((style (match-string 1))
 	      (name (match-string 2)))
 	  (setq style (rw-include-key style name))
-	  ;; This eventually and trickily arranges for non-gdb headers
-	  ;; to be included earlier.
-	  (when (and (string= style "\"")
-		     (not (member (expand-file-name name rw-directory)
-				  (rw-files))))
-	    ;; Must be between " and <.
-	    (setq style "."))
 	  (push (list name style (match-string 0)) result))
 	(forward-line)
 	(setq last-include (point))
