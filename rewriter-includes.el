@@ -1,7 +1,5 @@
 ;; Sort includes.
 
-;; FIXME insert header guards
-
 (defun rw-skip-intro (filename is-header)
   ;; Skip all available.
   (forward-comment 9999)
