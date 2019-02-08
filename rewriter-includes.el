@@ -14,17 +14,22 @@
 
 (defun rw-include-key (style name)
   (if (string= style "<")
-      (if (save-match-data (string-match "\\.h$" name))
+      (if (string-suffix-p ".h" name)
 	  ;; Put C includes before C++ includes.
-	  "@"
+	  "0"
 	;; C++ includes
-	"<")
-    ;; This eventually and trickily arranges for non-gdb headers to be
-    ;; included earlier.
-    (if (not (member (expand-file-name name rw-directory) (rw-files)))
-	;; Must be between " and <.
-	(setq style ".")
-      style)))
+	"1")
+    (cond
+     ;; This eventually and trickily arranges for non-gdb headers to
+     ;; be included earlier.
+     ((not (member (expand-file-name name rw-directory) (rw-files)))
+      ;; Must be between " and <.
+      (setq style "2"))
+     ;; Sort subdirectories into heir own stanzas.  Note that this
+     ;; works because letters come after the other style keys.
+     ((save-match-data (string-match "/" name))
+      (file-name-directory name))
+     (t "~"))))
 
 (defun rw-scan-condition ()
   (let ((kind nil)
@@ -112,7 +117,7 @@
 	(sort include-list
 	      (lambda (a b)
 		;; <> sorts earlier than ""
-		(if (string> (cadr a) (cadr b))
+		(if (string< (cadr a) (cadr b))
 		    t
 		  (if (string= (cadr a) (cadr b))
 		      (string< (car a) (car b)))))))
