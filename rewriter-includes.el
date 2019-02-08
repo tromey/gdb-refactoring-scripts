@@ -12,6 +12,15 @@
       (message "%s does not have #define !?" filename))
     (skip-chars-forward " \t\r\n")))
 
+(defun rw-include-key (style name)
+  (if (string= style "<")
+      (if (save-match-data (string-match "\\.h$" name))
+	  ;; Put C includes before C++ includes.
+	  "@"
+	;; C++ includes
+	"<")
+    style))
+
 (defun rw-scan-condition ()
   (let ((kind nil)
 	(start (point))
@@ -22,6 +31,7 @@
     (while (looking-at "#include \\([\"<]\\)\\([^\">]*\\)[\">]")
       (let ((style (match-string 1))
 	    (name (match-string 2)))
+	(setq style (rw-include-key style name))
 	(unless first-name
 	  (setq first-name name))
 	(if kind
@@ -49,6 +59,7 @@
        ((looking-at "#include \\([\"<]\\)\\([^\">]*\\)[\">]")
 	(let ((style (match-string 1))
 	      (name (match-string 2)))
+	  (setq style (rw-include-key style name))
 	  ;; This eventually and trickily arranges for non-gdb headers
 	  ;; to be included earlier.
 	  (when (and (string= style "\"")
