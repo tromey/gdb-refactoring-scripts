@@ -121,7 +121,7 @@
 		    t
 		  (if (string= (cadr a) (cadr b))
 		      (string< (car a) (car b)))))))
-  ;; Insert a newline between base and <> and "" stanzas.
+  ;; Insert a newline between stanzas.
   (let ((last-bracket
 	 ;; Do not need a new stanza initially in the .h case.
 	 (if is-header
@@ -132,7 +132,10 @@
 	(unless (string= last-bracket new-bracket)
 	  (insert "\n")
 	  (setq last-bracket new-bracket))
-	(insert (nth 2 item) "\n")))))
+	(insert (nth 2 item) "\n"))))
+  ;; Make sure there is a newline before the body of the file.
+  (unless (looking-at "\n")
+    (insert "\n")))
 
 (defun rw-rewrite-includes ()
   (unless (or buffer-read-only
