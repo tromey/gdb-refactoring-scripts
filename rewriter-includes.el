@@ -99,7 +99,8 @@
 	     "server.h")
 	    (t "defs.h"))))
       (insert "#include \"" main-header "\"\n")
-      (setq include-list (rw-delete-include include-list main-header))
+      (setq include-list (rw-delete-include include-list
+					    (file-name-nondirectory main-header)))
       (let ((header (concat (file-name-sans-extension filename) ".h")))
 	(when (and (member (expand-file-name header rw-directory) (rw-files))
 		   ;; Ugh.
@@ -111,8 +112,10 @@
 		   (t rw-directory)))
 		 (relative-name (file-relative-name header base-dir)))
 	    (insert "#include \"" relative-name "\"\n")
-	    (setq include-list (rw-delete-include include-list
-						  relative-name)))))))
+	    (setq include-list
+		  (rw-delete-include
+		   include-list
+		   (file-name-nondirectory relative-name))))))))
   (setq include-list
 	(sort include-list
 	      (lambda (a b)
