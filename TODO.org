@@ -1,3 +1,4 @@
+* TODO make it possible to run a rewriter on a single file
 * TODO replace rw-rewrite with a macro
 * TODO option parsing
 * TODO verbose mode
