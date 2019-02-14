@@ -74,7 +74,7 @@
 	(forward-line)
 	(setq last-include (point))
 	(setq keep-going t))
-       ((looking-at "#if.*HAVE_[A-Z0-9_]*_H")
+       ((looking-at "#if.*HAVE_[A-Z0-9_]*")
 	(let ((cond-include (rw-scan-condition)))
 	  (when cond-include
 	    (push cond-include result)
