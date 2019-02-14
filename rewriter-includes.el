@@ -30,6 +30,15 @@
       "3")
      (t "4"))))
 
+(defun rw-include-comment (style)
+  (or (cdr (assoc style
+		  '(("0" . "Standard C includes")
+		    ("1" . "Standard C++ includes")
+		    ("2" . "Local non-gdb includes")
+		    ("3" . "Local subdirectory includes")
+		    ("4" . "Local includes"))))
+      (error "Missing style %s" style)))
+
 (defun rw-scan-condition ()
   (let ((kind nil)
 	(start (point))
@@ -133,6 +142,10 @@
       (let ((new-bracket (cadr item)))
 	(unless (string= last-bracket new-bracket)
 	  (insert "\n")
+	  ;; Note we do not insert stanza comments -- this script
+	  ;; doesn't try to handle embedded comments, so adding such
+	  ;; comments will make this script not be idempotent.
+	  ;; (insert "\n/* " (rw-include-comment new-bracket) " */\n")
 	  (setq last-bracket new-bracket))
 	(insert (nth 2 item) "\n"))))
   ;; Make sure there is a newline before the body of the file.
