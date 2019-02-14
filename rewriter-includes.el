@@ -24,12 +24,11 @@
      ;; be included earlier.
      ((not (member (expand-file-name name rw-directory) (rw-files)))
       ;; Must be between " and <.
-      (setq style "2"))
-     ;; Sort subdirectories into heir own stanzas.  Note that this
-     ;; works because letters come after the other style keys.
+      "2")
+     ;; Sort subdirectories into a single stanza.
      ((save-match-data (string-match "/" name))
-      (file-name-directory name))
-     (t "~"))))
+      "3")
+     (t "4"))))
 
 (defun rw-scan-condition ()
   (let ((kind nil)
