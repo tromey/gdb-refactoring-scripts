@@ -1,8 +1,33 @@
 ;; Sort includes.
 
+(defconst rw-include-comments
+  '(("0" . "Standard C includes")
+    ("1" . "Standard C++ includes")
+    ("2" . "Local non-gdb includes")
+    ("3" . "Local subdirectory includes")
+    ("4" . "Local includes")))
+
+(defconst rw-include-regexp
+  (concat "/\\* \\("
+	  (mapconcat #'cdr rw-include-comments "\\|")
+	  "\\).  \\*/$"))
+
+(defun rw-looking-at-h-comment ()
+  "True if looking at a standard header comment."
+  (looking-at rw-include-regexp))
+
+(defun rw-skip-intro-comment ()
+  ;; The intro comment.
+  (forward-comment 1)
+  (while (progn
+	   (skip-chars-forward " \t\r\n")
+	   (and (looking-at "/\\*")
+		(not (rw-looking-at-h-comment))))
+    (forward-comment 1)))
+
 (defun rw-skip-intro (filename is-header)
   ;; Skip all available.
-  (forward-comment 9999)
+  (rw-skip-intro-comment)
   (when is-header
     (if (looking-at "#if\\(ndef\\| !\\s-*defined\\)")
 	(forward-line)
@@ -31,12 +56,7 @@
      (t "4"))))
 
 (defun rw-include-comment (style)
-  (or (cdr (assoc style
-		  '(("0" . "Standard C includes")
-		    ("1" . "Standard C++ includes")
-		    ("2" . "Local non-gdb includes")
-		    ("3" . "Local subdirectory includes")
-		    ("4" . "Local includes"))))
+  (or (cdr (assoc style rw-include-comments))
       (error "Missing style %s" style)))
 
 (defun rw-scan-condition ()
@@ -73,6 +93,10 @@
     (while keep-going
       (setq keep-going nil)
       (skip-chars-forward " \t\r\n")
+      ;; Skip the standard comments.
+      (when (rw-looking-at-h-comment)
+	(forward-comment 1)
+	(skip-chars-forward " \t\r\n"))
       (cond
        ((looking-at "#include \\([\"<]\\)\\([^\">]*\\)[\">]")
 	(let ((style (match-string 1))
@@ -146,11 +170,8 @@
     (dolist (item include-list)
       (let ((new-bracket (cadr item)))
 	(unless (string= last-bracket new-bracket)
-	  (insert "\n")
-	  ;; Note we do not insert stanza comments -- this script
-	  ;; doesn't try to handle embedded comments, so adding such
-	  ;; comments will make this script not be idempotent.
-	  ;; (insert "\n/* " (rw-include-comment new-bracket) " */\n")
+	  ;; (insert "\n")
+	  (insert "\n/* " (rw-include-comment new-bracket) ".  */\n")
 	  (setq last-bracket new-bracket))
 	(insert (nth 2 item) "\n"))))
   ;; Make sure there is a newline before the body of the file.
@@ -158,6 +179,7 @@
     (insert "\n")))
 
 (defun rw-rewrite-includes ()
+  (c++-mode)
   (unless (or buffer-read-only
 	      ;; This file is weird so we skip it.
 	      (string-match "/gdbreplay\\.c$" (buffer-file-name)))
