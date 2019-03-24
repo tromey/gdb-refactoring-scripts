@@ -8,10 +8,11 @@
 (defconst rw-to (pop argv))
 
 (defun rw-srepl-one ()
-  (while (re-search-forward rw-from nil t)
-    (replace-match rw-to nil t)
-    (rw-add-change-log-entry))
-  (rw-final-change-log-text (concat "Replace \"" rw-raw-from
-				    "\" with \"" rw-to "\".")))
+  (unless buffer-read-only
+    (while (re-search-forward rw-from nil t)
+      (replace-match rw-to nil t)
+      (rw-add-change-log-entry))
+    (rw-final-change-log-text (concat "Replace \"" rw-raw-from
+				      "\" with \"" rw-to "\"."))))
 
 (rw-rewrite #'rw-srepl-one)
