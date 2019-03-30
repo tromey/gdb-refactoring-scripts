@@ -122,61 +122,61 @@
    include-list))
 
 (defun rw-insert-new-includes (is-header filename include-list)
-  (unless is-header
-    (let ((main-header
-	   (cond
-	    ((string-match "/\\(arch\\|common\\|nat\\|target\\)/" filename)
-	     "common/common-defs.h")
-	    ((string-match "/gdbserver/" filename)
-	     "server.h")
-	    (t "defs.h"))))
-      (insert "#include \"" main-header "\"\n")
-      ;; Delete both forms to preserve idempotency.
-      (setq include-list (rw-delete-include include-list
-					    (file-name-nondirectory main-header)))
-      (setq include-list (rw-delete-include include-list main-header))
-      (let ((header (concat (file-name-sans-extension filename) ".h")))
-	(when (and (member (expand-file-name header rw-directory) (rw-files))
-		   ;; Ugh.
-		   (not (string-match "/thread-iter\\.h$" header)))
-	  (let* ((base-dir
-		  (cond
-		   ((string-match "/gdbserver/" filename)
-		    (file-name-directory filename))
-		   (t rw-directory)))
-		 (relative-name (file-relative-name header base-dir)))
-	    (insert "#include \"" relative-name "\"\n")
-	    ;; Delete both forms to preserve idempotency.
-	    (setq include-list
-		  (rw-delete-include
-		   include-list
-		   (file-name-nondirectory relative-name)))
-	    (setq include-list (rw-delete-include include-list
-						  relative-name)))))))
-  (setq include-list
-	(sort include-list
-	      (lambda (a b)
-		;; <> sorts earlier than ""
-		(if (string< (cadr a) (cadr b))
-		    t
-		  (if (string= (cadr a) (cadr b))
-		      (string< (car a) (car b)))))))
-  ;; Insert a newline between stanzas.
-  (let ((last-bracket
-	 ;; Do not need a new stanza initially in the .h case.
-	 (if is-header
-	     (cadr (car include-list))
-	   "")))
-    (dolist (item include-list)
-      (let ((new-bracket (cadr item)))
-	(unless (string= last-bracket new-bracket)
-	  ;; (insert "\n")
-	  (insert "\n/* " (rw-include-comment new-bracket) ".  */\n")
-	  (setq last-bracket new-bracket))
-	(insert (nth 2 item) "\n"))))
-  ;; Make sure there is a newline before the body of the file.
-  (unless (looking-at "\n")
-    (insert "\n")))
+  (let ((result nil))
+    (unless is-header
+      (let ((main-header
+	     (cond
+	      ((string-match "/\\(arch\\|common\\|nat\\|target\\)/" filename)
+	       "common/common-defs.h")
+	      ((string-match "/gdbserver/" filename)
+	       "server.h")
+	      (t "defs.h"))))
+	(push (concat "#include \"" main-header "\"\n") result)
+	;; Delete both forms to preserve idempotency.
+	(setq include-list (rw-delete-include include-list
+					      (file-name-nondirectory main-header)))
+	(setq include-list (rw-delete-include include-list main-header))
+	(let ((header (concat (file-name-sans-extension filename) ".h")))
+	  (when (and (member (expand-file-name header rw-directory) (rw-files))
+		     ;; Ugh.
+		     (not (string-match "/thread-iter\\.h$" header)))
+	    (let* ((base-dir
+		    (cond
+		     ((string-match "/gdbserver/" filename)
+		      (file-name-directory filename))
+		     (t rw-directory)))
+		   (relative-name (file-relative-name header base-dir)))
+	      (push (concat "#include \"" relative-name "\"\n") result)
+	      ;; Delete both forms to preserve idempotency.
+	      (setq include-list
+		    (rw-delete-include
+		     include-list
+		     (file-name-nondirectory relative-name)))
+	      (setq include-list (rw-delete-include include-list
+						    relative-name)))))))
+    (setq include-list
+	  (sort include-list
+		(lambda (a b)
+		  ;; <> sorts earlier than ""
+		  (if (string< (cadr a) (cadr b))
+		      t
+		    (if (string= (cadr a) (cadr b))
+			(string< (car a) (car b)))))))
+    ;; Insert a newline between stanzas.
+    (let ((last-bracket
+	   ;; Do not need a new stanza initially in the .h case.
+	   (if is-header
+	       (cadr (car include-list))
+	     "")))
+      (dolist (item include-list)
+	(let ((new-bracket (cadr item)))
+	  (unless (string= last-bracket new-bracket)
+	    ;; (insert "\n")
+	    (push (concat "\n/* " (rw-include-comment new-bracket) ".  */\n")
+		  result)
+	    (setq last-bracket new-bracket))
+	  (push (concat (nth 2 item) "\n") result))))
+    (apply #'concat (nreverse result))))
 
 (defun rw-rewrite-includes ()
   (c++-mode)
@@ -188,9 +188,18 @@
       (let* ((start (point))
 	     (include-list (rw-collect-includes)))
 	(when (> (point) start)
-	  (delete-region start (point))
-	  (rw-add-change-log-entry)
-	  (rw-insert-new-includes is-header (buffer-file-name) include-list))))
+	  (let ((end (point))
+		(new-text (rw-insert-new-includes is-header
+						  (buffer-file-name)
+						  include-list)))
+	    (unless (string= new-text
+			     (buffer-substring start end))
+	      (delete-region start end)
+	      (insert new-text)
+	      ;; Make sure there is a newline before the body of the file.
+	      (unless (looking-at "\n")
+		(insert "\n"))
+	      (rw-add-change-log-entry))))))
     (rw-final-change-log-text "Sort headers.")))
 
 (rw-rewrite #'rw-rewrite-includes)
