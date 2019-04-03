@@ -16,7 +16,7 @@
      ((match-beginning 1)
       (replace-match "try" t t nil 1))
      ((match-beginning 2)
-      (replace-match "catch (const struct gdb_exception_\\4 &\\3)"
+      (replace-match "catch (const gdb_exception_\\4 &\\3)"
 		     t nil nil 2))
      ((match-beginning 5)
       (beginning-of-line)
