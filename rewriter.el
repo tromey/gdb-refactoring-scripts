@@ -28,10 +28,14 @@
   (unless rw-memoize-files
     (setq rw-memoize-files
 	  (sort
-	   (cl-remove-if
-	    (lambda (name)
-	      (string-match "/\\(gnulib\\|testsuite\\)/" name))
-	    (directory-files-recursively rw-directory "\\.[cyhl]$"))
+	   (if argv
+	       (progn
+		 (cl-assert (string= (pop argv) "--"))
+		 argv)
+	     (cl-remove-if
+	      (lambda (name)
+		(string-match "/\\(gnulib\\|testsuite\\)/" name))
+	      (directory-files-recursively rw-directory "\\.[cyhl]$")))
 	   #'string<)))
   rw-memoize-files)
 
