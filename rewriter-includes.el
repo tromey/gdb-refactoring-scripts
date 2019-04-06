@@ -1,7 +1,7 @@
 ;; Sort includes.
 
 (defconst rw-include-comments
-  '(("0" . "Standard C includes")
+  '(("0" . "System C includes")
     ("1" . "Standard C++ includes")
     ("2" . "Local non-gdb includes")
     ("3" . "Local subdirectory includes")
