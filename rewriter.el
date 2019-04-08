@@ -36,7 +36,9 @@
 	      (lambda (name)
 		(string-match "/\\(gnulib\\|testsuite\\)/" name))
 	      (directory-files-recursively rw-directory "\\.[cyhl]$")))
-	   #'string<)))
+	   ;; Note that we sort in reverse order, so that ChangeLog
+	   ;; entries ultimately end up in the correct order.
+	   #'string>)))
   rw-memoize-files)
 
 (defun rw-rewrite (callback)
