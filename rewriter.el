@@ -88,5 +88,13 @@
 		(not (rw-looking-at-h-comment))))
     (forward-comment 1)))
 
+(defun rw-extract-and-skip-expr (ender)
+  (skip-syntax-forward " ")
+  (let ((start (point)))
+    (while (not (looking-at ender))
+      (forward-sexp)
+      (skip-syntax-forward " "))
+    (buffer-substring start (point))))
+
 (load (concat "rewriter-" rw-subcommand))
 (rw-save-buffers)
