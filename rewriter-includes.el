@@ -16,15 +16,6 @@
   "True if looking at a standard header comment."
   (looking-at rw-include-regexp))
 
-(defun rw-skip-intro-comment ()
-  ;; The intro comment.
-  (forward-comment 1)
-  (while (progn
-	   (skip-chars-forward " \t\r\n")
-	   (and (looking-at "/\\*")
-		(not (rw-looking-at-h-comment))))
-    (forward-comment 1)))
-
 (defun rw-skip-intro (filename is-header)
   ;; Skip all available.
   (rw-skip-intro-comment)

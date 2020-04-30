@@ -79,5 +79,14 @@
 	  (delete-blank-lines))
 	(setq rw-was-first-cl-entry nil))))
 
+(defun rw-skip-intro-comment ()
+  ;; The intro comment.
+  (forward-comment 1)
+  (while (progn
+	   (skip-chars-forward " \t\r\n")
+	   (and (looking-at "/\\*")
+		(not (rw-looking-at-h-comment))))
+    (forward-comment 1)))
+
 (load (concat "rewriter-" rw-subcommand))
 (rw-save-buffers)
