@@ -1,12 +1,12 @@
 ;; rewrite a single gdbarch method.
 
-;; Usage: emacs --script rewriter.el gdbarch method-name
+;; Usage: emacs --script rewriter.el gdbarch
 
-(defconst rw-arch-method (pop argv))
+(defvar rw-arch-method)
 
-(defconst rw-arch-setter (concat "\\_<set_gdbarch_" rw-arch-method "\\_>"))
-(defconst rw-arch-getter (concat "\\_<gdbarch_" rw-arch-method "\\(_p\\)?\\_>"))
-(defconst rw-arch-p (concat "\\_<gdbarch_" rw-arch-method "\\_>"))
+(defvar rw-arch-setter)
+(defvar rw-arch-getter)
+(defvar rw-arch-p)
 
 (defun rw-arch-setter ()
   (while (re-search-forward rw-arch-setter nil t)
@@ -21,7 +21,8 @@
 	(forward-char)
 	(skip-syntax-forward " ")
 	(delete-region start (point))
-	(insert lhs "->" rw-arch-method ".set (")))))
+	(insert lhs "->" rw-arch-method ".set (")
+	(rw-add-change-log-entry)))))
 
 (defun rw-arch-getter ()
   (while (re-search-forward rw-arch-getter nil t)
@@ -42,12 +43,36 @@
 		(if is-p-form
 		    ".is_set"
 		  "")
-		" (")))))
+		" (")
+	(rw-add-change-log-entry)))))
 
 (defun rw-arch-process ()
-  (unless buffer-read-only
-    (rw-arch-setter)
-    (goto-char (point-min))
-    (rw-arch-getter)))
+  (let ((rw-arch-setter (concat "\\_<set_gdbarch_" rw-arch-method "\\_>"))
+	(rw-arch-getter (concat "\\_<gdbarch_" rw-arch-method "\\(_p\\)?\\_>"))
+	(rw-arch-p (concat "\\_<gdbarch_" rw-arch-method "\\_>")))
+    (unless buffer-read-only
+      (rw-arch-setter)
+      (goto-char (point-min))
+      (rw-arch-getter)
+      (rw-final-change-log-text "Update."))))
 
-(rw-rewrite #'rw-arch-process)
+(defun rw-scan-gdbarch.sh ()
+  (find-file "gdbarch.sh")
+  (goto-char (point-min))
+  (re-search-forward "cat <<EOF")
+  (forward-line)
+  (while (not (looking-at "EOF"))
+    ;; Treat non-matching lines as comments.
+    (when (looking-at "^[^;\n]+;[^;\n]+;\\([^;\n]+\\);")
+      (let ((rw-arch-method (match-string 1)))
+	(message "Processing %s" rw-arch-method)
+	(save-excursion
+	  (dolist (file (rw-files))
+	    (find-file file)
+	    (goto-char (point-min))
+	    (rw-arch-process)
+	    (when (buffer-modified-p)
+	      (save-buffer))))))
+    (forward-line)))
+
+(rw-scan-gdbarch.sh)
