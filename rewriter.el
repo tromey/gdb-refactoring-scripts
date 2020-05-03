@@ -96,5 +96,10 @@
       (skip-syntax-forward " "))
     (buffer-substring start (point))))
 
+(defun rw-git-commit (message)
+  (call-process "git" nil nil nil "commit" "-a" "-m" message)
+  ;; Reset the ChangeLog state.
+  (setq add-log-always-start-new-record t))
+
 (load (concat "rewriter-" rw-subcommand))
 (rw-save-buffers)

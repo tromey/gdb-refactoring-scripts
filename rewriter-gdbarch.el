@@ -64,7 +64,8 @@
   (while (not (looking-at "EOF"))
     ;; Treat non-matching lines as comments.
     (when (looking-at "^[^;\n]+;[^;\n]+;\\([^;\n]+\\);")
-      (let ((rw-arch-method (match-string 1)))
+      (let ((rw-arch-method (match-string 1))
+	    (changed nil))
 	(message "Processing %s" rw-arch-method)
 	(save-excursion
 	  (dolist (file (rw-files))
@@ -72,7 +73,12 @@
 	    (goto-char (point-min))
 	    (rw-arch-process)
 	    (when (buffer-modified-p)
-	      (save-buffer))))))
+	      (setq changed t)
+	      (save-buffer))))
+	(if changed
+	    (rw-git-commit (concat "Changes for " rw-arch-method))
+	  ;; This shouldn't happen, but let's check.
+	  (message (concat "!!!! No changes for " rw-arch-method)))))
     (forward-line)))
 
 (rw-scan-gdbarch.sh)
