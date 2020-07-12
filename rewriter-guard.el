@@ -42,7 +42,10 @@
 	     (string-match "\\.h$" (buffer-file-name)))
     ;; Skip all available.
     (forward-comment 9999)
-    (let* ((rel-name (file-relative-name (buffer-file-name) rw-directory))
+    (let* ((rel-name (file-relative-name (buffer-file-name)
+					 (if (equal rw-subdir-name "gdb")
+					     rw-directory
+					   rw-base-directory)))
 	   (include-name (string-join (split-string
 				       (upcase rel-name) "[-./]") "_")))
       (if (and (looking-at "#if\\(ndef\\| ![ \t]*defined\\)")

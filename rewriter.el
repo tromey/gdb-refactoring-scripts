@@ -2,6 +2,13 @@
 
 (defvar rw-directory (expand-file-name "."))
 
+;; Rewriter is only ever run in a subdirectory of the top-level
+;; binutils-gdb repository.
+(defvar rw-base-directory (expand-file-name ".."))
+
+;; Which subdir we're in.
+(defvar rw-subdir-name (file-name-nondirectory rw-base-directory))
+
 (require 'add-log)
 (setq add-log-always-start-new-record t)
 
