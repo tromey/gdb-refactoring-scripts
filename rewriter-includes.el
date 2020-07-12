@@ -4,8 +4,7 @@
   '(("0" . "System C includes")
     ("1" . "Standard C++ includes")
     ("2" . "Local non-gdb includes")
-    ("3" . "Local subdirectory includes")
-    ("4" . "Local includes")))
+    ("3" . "Local includes")))
 
 (defconst rw-include-regexp
   (concat "/\\* \\("
@@ -38,13 +37,13 @@
     (cond
      ;; This eventually and trickily arranges for non-gdb headers to
      ;; be included earlier.
-     ((not (member (expand-file-name name rw-directory) (rw-files)))
+     ((not (member (expand-file-name name rw-base-directory) (rw-files)))
       ;; Must be between " and <.
       "2")
      ;; Sort subdirectories into a single stanza.
      ((save-match-data (string-match "/" name))
       "3")
-     (t "4"))))
+     (t "3"))))
 
 (defun rw-include-comment (style)
   (or (cdr (assoc style rw-include-comments))
@@ -128,14 +127,14 @@
 					      (file-name-nondirectory main-header)))
 	(setq include-list (rw-delete-include include-list main-header))
 	(let ((header (concat (file-name-sans-extension filename) ".h")))
-	  (when (and (member (expand-file-name header rw-directory) (rw-files))
+	  (when (and (member (expand-file-name header rw-base-directory) (rw-files))
 		     ;; Ugh.
 		     (not (string-match "/thread-iter\\.h$" header)))
 	    (let* ((base-dir
 		    (cond
 		     ((string-match "/gdbserver/" filename)
 		      (file-name-directory filename))
-		     (t rw-directory)))
+		     (t rw-base-directory)))
 		   (relative-name (file-relative-name header base-dir)))
 	      (push (concat "#include \"" relative-name "\"\n") result)
 	      ;; Delete both forms to preserve idempotency.
