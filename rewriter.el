@@ -35,7 +35,7 @@
 	     (cl-remove-if
 	      (lambda (name)
 		(string-match "/\\(gnulib\\|testsuite\\)/" name))
-	      (directory-files-recursively rw-directory "\\.[cyhl]$")))
+	      (directory-files-recursively rw-directory "\\.\\([cyhl]\\|cc\\)$")))
 	   ;; Note that we sort in reverse order, so that ChangeLog
 	   ;; entries ultimately end up in the correct order.
 	   #'string>)))
