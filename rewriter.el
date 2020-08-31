@@ -95,12 +95,15 @@
 		(not (rw-looking-at-h-comment))))
     (forward-comment 1)))
 
-(defun rw-extract-and-skip-expr (ender)
+(defun rw-skip-expr (ender)
   (skip-syntax-forward " ")
+  (while (not (looking-at ender))
+    (forward-sexp)
+    (skip-syntax-forward " ")))
+
+(defun rw-extract-and-skip-expr (ender)
   (let ((start (point)))
-    (while (not (looking-at ender))
-      (forward-sexp)
-      (skip-syntax-forward " "))
+    (rw-skip-expr ender)
     (buffer-substring start (point))))
 
 (defun rw-git-commit (message)
