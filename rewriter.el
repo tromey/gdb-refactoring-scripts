@@ -82,5 +82,11 @@
   ;; Reset the ChangeLog state.
   (setq add-log-always-start-new-record t))
 
+(defun rw-error (text)
+  (message "%s:%d: error: %s"
+	   (buffer-file-name)
+	   (line-number-at-pos)
+	   text))
+
 (load (concat "rewriter-" rw-subcommand))
 (rw-save-buffers)
