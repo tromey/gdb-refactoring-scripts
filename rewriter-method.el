@@ -25,8 +25,6 @@
 	  (backward-char)
 	  (delete-region start end)
 	  (delete-char 1)
-	  (insert "->" (cdr (assoc item rw-alist)) " ()")
-	  (rw-add-change-log-entry)))))
-  (rw-final-change-log-text "Update."))
+	  (insert "->" (cdr (assoc item rw-alist)) " ()"))))))
 
 (rw-rewrite #'rw-method-replace)

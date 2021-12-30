@@ -9,17 +9,8 @@
 ;; Which subdir we're in.
 (defvar rw-subdir-name (file-name-nondirectory rw-base-directory))
 
-(require 'add-log)
-(setq add-log-always-start-new-record t)
-
 (require 'subr-x)
 (require 'cl-macs)
-
-(setq add-log-full-name
-      (string-trim (shell-command-to-string "git config user.name")))
-
-(setq add-log-mailing-address
-      (string-trim (shell-command-to-string "git config user.email")))
 
 (defconst rw-base (file-name-directory load-file-name))
 (push rw-base load-path)
@@ -60,31 +51,11 @@
     (kill-buffer)))
 
 (defun rw-save-buffers ()
-  "Save unsaved buffers.  Handy for ChangeLog."
+  "Save unsaved buffers."
   (dolist (buf (buffer-list))
     (set-buffer buf)
     (when (and buffer-file-name (buffer-modified-p))
       (save-buffer))))
-
-(defun rw-add-change-log-entry ()
-  (save-excursion
-    (add-change-log-entry)
-    (setq add-log-always-start-new-record nil)))
-
-;; This is local to the ChangeLog.
-(defvar-local rw-was-first-cl-entry t)
-
-(defun rw-final-change-log-text (text)
-  ;; Called in the source buffer, only do something if modified.
-  (if (buffer-modified-p)
-      (save-excursion
-	(find-file (find-change-log))
-	;; Point should already be at the right spot.
-	(insert text)
-	(fill-paragraph)
-	(unless rw-was-first-cl-entry
-	  (delete-blank-lines))
-	(setq rw-was-first-cl-entry nil))))
 
 (defun rw-skip-intro-comment ()
   ;; The intro comment.

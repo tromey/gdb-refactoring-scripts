@@ -11,7 +11,6 @@
 
 (defun rw-iter-one ()
   (while (re-search-forward rw-iter-rx nil t)
-    (replace-match rw-iter-replace)
-    (rw-add-change-log-entry)))
+    (replace-match rw-iter-replace)))
 
 (rw-rewrite #'rw-iter-one)

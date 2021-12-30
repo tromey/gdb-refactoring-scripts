@@ -24,8 +24,6 @@
      (t
       (error "BUG"))))
   (when (buffer-modified-p)
-    (goto-char (point-min))
-    (rw-add-change-log-entry)
-    (rw-final-change-log-text "Use C++ exception handling.")))
+    (goto-char (point-min))))
 
 (rw-rewrite #'rw-rewrite-try-catch)

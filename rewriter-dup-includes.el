@@ -6,8 +6,7 @@
 
 (defun rw-duplicate-includes ()
   (while (re-search-forward "^/\\*\\s-*#include.*\\*/$" nil t)
-    (delete-region (match-beginning 0) (1+ (match-end 0)))
-    (rw-add-change-log-entry))
+    (delete-region (match-beginning 0) (1+ (match-end 0))))
   (let ((table (make-hash-table :test 'equal)))
     (goto-char (point-min))
     ;; could maybe check for "" -vs- <> consistency.
@@ -16,9 +15,7 @@
 	  (when (and (gethash name table)
 		     (not (rw-include-ok name)))
 	    (message "Deleting #include {{%s}}" name)
-	    (delete-region (match-beginning 0) (1+ (match-end 0)))
-	    (rw-add-change-log-entry))
-	  (puthash name t table))))
-  (rw-final-change-log-text "Fix includes."))
+	    (delete-region (match-beginning 0) (1+ (match-end 0))))
+	  (puthash name t table)))))
 
 (rw-rewrite #'rw-duplicate-includes)

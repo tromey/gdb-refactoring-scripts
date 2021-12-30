@@ -25,7 +25,6 @@
 
 (defun rw-rewrite-guard (new-name text)
   (goto-char (point-min))
-  (rw-add-change-log-entry)
   (forward-comment 1)
   (insert "\n\n#ifndef " new-name "\n"
 	  "#define " new-name "\n\n")
@@ -34,8 +33,7 @@
 			   (point)))
   (goto-char (point-max))
   (delete-blank-lines)
-  (insert "\n#endif /* " new-name " */\n")
-  (rw-final-change-log-text text))
+  (insert "\n#endif /* " new-name " */\n"))
 
 (defun rw-rewrite-guards ()
   (when (and (not buffer-read-only)

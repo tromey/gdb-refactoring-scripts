@@ -21,8 +21,7 @@
 	(forward-char)
 	(skip-syntax-forward " ")
 	(delete-region start (point))
-	(insert lhs "->" rw-arch-method ".set (")
-	(rw-add-change-log-entry)))))
+	(insert lhs "->" rw-arch-method ".set (")))))
 
 (defun rw-arch-getter ()
   (while (re-search-forward rw-arch-getter nil t)
@@ -43,8 +42,7 @@
 		(if is-p-form
 		    ".is_set"
 		  "")
-		" (")
-	(rw-add-change-log-entry)))))
+		" (")))))
 
 (defun rw-arch-process ()
   (let ((rw-arch-setter (concat "\\_<set_gdbarch_" rw-arch-method "\\_>"))
@@ -53,8 +51,7 @@
     (unless buffer-read-only
       (rw-arch-setter)
       (goto-char (point-min))
-      (rw-arch-getter)
-      (rw-final-change-log-text "Update."))))
+      (rw-arch-getter))))
 
 (defun rw-scan-gdbarch.sh ()
   (find-file "gdbarch.sh")

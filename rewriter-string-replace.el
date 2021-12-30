@@ -10,9 +10,6 @@
 (defun rw-srepl-one ()
   (unless buffer-read-only
     (while (re-search-forward rw-from nil t)
-      (replace-match rw-to nil t)
-      (rw-add-change-log-entry))
-    (rw-final-change-log-text (concat "Replace \"" rw-raw-from
-				      "\" with \"" rw-to "\"."))))
+      (replace-match rw-to nil t))))
 
 (rw-rewrite #'rw-srepl-one)

@@ -13,8 +13,6 @@
 					      var-name
 					      ")"))))
 	(while (re-search-forward throw-expr bound t)
-	  (replace-match "throw" t t)
-	  (rw-add-change-log-entry)))))
-  (rw-final-change-log-text "Replace throw_exception with throw."))
+	  (replace-match "throw" t t))))))
 
 (rw-rewrite #'rw-rewrite-rethrow)

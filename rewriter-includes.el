@@ -188,8 +188,6 @@
 	      (insert new-text)
 	      ;; Make sure there is a newline before the body of the file.
 	      (unless (looking-at "\n")
-		(insert "\n"))
-	      (rw-add-change-log-entry))))))
-    (rw-final-change-log-text "Sort headers.")))
+		(insert "\n")))))))))
 
 (rw-rewrite #'rw-rewrite-includes)
