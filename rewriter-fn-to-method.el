@@ -51,9 +51,15 @@
 	    ;; If we need the ",", re-insert it.
 	    (when (and remove-comma (looking-at ","))
 	      (rw-remove-comma)))))
+      ;; Insert the argument again, this time as 'this'.
       (if (string-match "^&" saved-text)
+	  ;; Turn f(&x) -> x.m()
 	  (insert (substring saved-text 1) "." rw-new-name)
-	(insert saved-text "->" rw-new-name))
+	;; Turn f(*x) -> (*x)->m()
+	(if (string-match "^\\*" saved-text)
+	    (insert "(" saved-text ")->" rw-new-name)
+	  ;; Turn f(x) -> x->m().
+	  (insert saved-text "->" rw-new-name)))
       (let ((start (point)))
 	(forward-list)
 	(indent-region start (point))))))
