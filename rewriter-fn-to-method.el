@@ -5,7 +5,10 @@
 ;; Defaults to 0; arguments start at 0.
 
 (defvar rw-function
-  (concat "\\_<\\(" (regexp-quote (pop argv)) "\\)\\_>[ \t\n]*(\\s *"))
+  ;; Allow an optional "::" before the function name.
+  (concat "\\(::\\)?\\_<\\("
+	  (regexp-quote (pop argv))
+	  "\\)\\_>[ \t\n]*(\\s *"))
 (defvar rw-new-name (pop argv))
 (defvar rw-arg (if argv
 		   (string-to-number (pop argv))
@@ -20,9 +23,12 @@
 
 (defun rw-fn-to-method ()
   (while (re-search-forward rw-function nil t)
-    (goto-char (match-end 1))
+    (goto-char (match-end 2))
     ;; Delete the original function name.
-    (delete-region (match-beginning 1) (match-end 1))
+    (delete-region (match-beginning 2) (match-end 2))
+    ;; If there was a "::", delete it too.
+    (when (match-beginning 1)
+      (delete-region (match-beginning 1) (match-end 1)))
     (let ((saved-text nil))
       (save-excursion
 	;; Move forward past the "(".
