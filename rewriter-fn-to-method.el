@@ -18,7 +18,7 @@
 
 (defvar rw-function
   ;; Allow an optional "::" before the function name.
-  (concat "\\(::\\)?\\_<\\("
+  (concat "[^.>]\\(::\\)?\\_<\\("
 	  rw-original-rx
 	  "\\)\\_>[ \t\n]*(\\s *"))
 (defvar rw-new-name (pop argv))
